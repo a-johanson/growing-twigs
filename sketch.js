@@ -1,17 +1,18 @@
 
 class GrowthSite {
-    constructor(x, y, direction, growth_speed, ttl) {
+    constructor(x, y, direction, growth_speed, ttl, generation) {
         this.x = x;
         this.y = y;
         this.direction = direction;
         this.initial_direction = direction;
         this.growth_speed = growth_speed;
         this.ttl = ttl;
+        this.generation = generation;
     }
 }
 
 function grow_twig(x, y, direction, growth_speed, ttl) {
-    let growth_sites = [new GrowthSite(x, y, direction, growth_speed, ttl)];
+    let growth_sites = [new GrowthSite(x, y, direction, growth_speed, ttl, 0)];
 
     while (growth_sites.length > 0) {
         growth_sites = growth_step(growth_sites);
@@ -31,19 +32,27 @@ function growth_step(growth_sites) {
                 gs.y,
                 2.0 * gs.initial_direction - gs.direction,
                 gs.growth_speed - 0.25 * noise(gs.x, gs.y, 5.0),
-                gs.ttl * 0.5
+                gs.ttl * 0.5,
+                gs.generation + 1
             ));
             gs.initial_direction = gs.direction;
         }
         const incr_x = gs.growth_speed * Math.cos(gs.direction);
         const incr_y = gs.growth_speed * Math.sin(gs.direction);
-        line(gs.x, gs.y, gs.x + incr_x, gs.y + incr_y);
+        draw_twig_segment(gs.x, gs.y, gs.x + incr_x, gs.y + incr_y, gs.generation, gs.ttl);
         gs.x += incr_x;
         gs.y += incr_y;
         gs.ttl -= 1;
     });
 
     return growth_sites.filter(gs => gs.ttl > 0);
+}
+
+function draw_twig_segment(x, y, new_x, new_y, generation, ttl) {
+    // strokeCap(ROUND);
+    stroke(0);
+    strokeWeight(2.0 * Math.pow(0.75, generation) + ttl / 50.0);
+    line(x, y, new_x, new_y);
 }
 
 function setup() {
