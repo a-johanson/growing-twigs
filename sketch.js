@@ -23,23 +23,18 @@ function growth_step(growth_sites) {
     const noise_scale = 0.1;
     const max_angle_incr = Math.PI / 16.0;
     const branching_angle = Math.PI / 6.0;
+    const max_noise_value = 0.9; // for unbiased results using 4 octaves of noise with a decay of 0.5, use = 15.0 / 16.0;
 
     growth_sites.forEach(gs => {
-        gs.direction += 2.0 * max_angle_incr * (noise(noise_scale * gs.x, noise_scale * gs.y) - 0.45);
+        gs.direction += 2.0 * max_angle_incr * (noise(noise_scale * gs.x, noise_scale * gs.y) - 0.5 * max_noise_value);
         if (Math.abs(gs.direction - gs.initial_direction) > branching_angle) {
-            growth_sites.push(new GrowthSite(
-                gs.x,
-                gs.y,
-                2.0 * gs.initial_direction - gs.direction,
-                gs.growth_speed - 0.25 * noise(gs.x, gs.y, 5.0),
-                gs.ttl * 0.5,
-                gs.generation + 1
-            ));
+            growth_sites.push(branch_growth_site(gs));
             gs.initial_direction = gs.direction;
         }
+
         const incr_x = gs.growth_speed * Math.cos(gs.direction);
         const incr_y = gs.growth_speed * Math.sin(gs.direction);
-        draw_twig_segment(gs.x, gs.y, gs.x + incr_x, gs.y + incr_y, gs.generation, gs.ttl);
+        draw_twig_segment(gs, gs.x + incr_x, gs.y + incr_y);
         gs.x += incr_x;
         gs.y += incr_y;
         gs.ttl -= 1;
@@ -48,11 +43,22 @@ function growth_step(growth_sites) {
     return growth_sites.filter(gs => gs.ttl > 0);
 }
 
-function draw_twig_segment(x, y, new_x, new_y, generation, ttl) {
+function branch_growth_site(gs) {
+    return new GrowthSite(
+        gs.x,
+        gs.y,
+        2.0 * gs.initial_direction - gs.direction,
+        gs.growth_speed - 0.25 * noise(gs.x, gs.y, 5.0),
+        gs.ttl * 0.5,
+        gs.generation + 1
+    );
+}
+
+function draw_twig_segment(gs, new_x, new_y) {
     // strokeCap(ROUND);
     stroke(0);
-    strokeWeight(2.0 * Math.pow(0.75, generation) + ttl / 50.0);
-    line(x, y, new_x, new_y);
+    strokeWeight(2.0 * Math.pow(0.75, gs.generation) + gs.ttl / 50.0);
+    line(gs.x, gs.y, new_x, new_y);
 }
 
 function setup() {
