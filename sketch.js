@@ -21,9 +21,9 @@ function grow_twig(x, y, direction, growth_speed, ttl) {
 
 function growth_step(growth_sites) {
     const noise_scale = 0.1;
+    const max_noise_value = 0.9; // for unbiased results using 4 octaves of noise with a decay of 0.5, use = 15.0 / 16.0;
     const max_angle_incr = Math.PI / 16.0;
     const branching_angle = Math.PI / 6.0;
-    const max_noise_value = 0.9; // for unbiased results using 4 octaves of noise with a decay of 0.5, use = 15.0 / 16.0;
 
     growth_sites.forEach(gs => {
         gs.direction += 2.0 * max_angle_incr * (noise(noise_scale * gs.x, noise_scale * gs.y) - 0.5 * max_noise_value);
