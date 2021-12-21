@@ -79,7 +79,7 @@ function add_global_growth_site() {
         rand(2, 3),
         rand(150, 300),
         0,
-        rand(45, 245)
+        rand(185, 245)
     ));
 }
 
@@ -102,8 +102,11 @@ function draw() {
     }
 
     frame_count += 1;
-    if (frame_count >= 60) {
+
+    if (frame_count % 12 == 0) {
+        background(0, 0, 0, 10);
+    }
+    if (frame_count % 45 == 0) {
         add_global_growth_site();
-        frame_count = 0;
     }
 }
