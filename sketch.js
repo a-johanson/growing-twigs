@@ -5,9 +5,10 @@ function rand(min, max) {
 }
 
 class GrowthSite {
-    constructor(x, y, direction, growth_speed, ttl, generation, color) {
+    constructor(x, y, scale, direction, growth_speed, ttl, generation, color) {
         this.x = x;
         this.y = y;
+        this.scale = scale;
         this.direction = direction;
         this.initial_direction = direction;
         this.growth_speed = growth_speed;
@@ -17,8 +18,8 @@ class GrowthSite {
     }
 }
 
-function grow_twig(x, y, direction, growth_speed, ttl, color) {
-    let growth_sites = [new GrowthSite(x, y, direction, growth_speed, ttl, 0, color)];
+function grow_twig(x, y, scale, direction, growth_speed, ttl, color) {
+    let growth_sites = [new GrowthSite(x, y, scale, direction, growth_speed, ttl, 0, color)];
 
     while (growth_sites.length > 0) {
         growth_sites = growth_step(growth_sites);
@@ -36,8 +37,8 @@ function growth_step(growth_sites) {
             gs.initial_direction = gs.direction;
         }
 
-        const incr_x = gs.growth_speed * Math.cos(gs.direction);
-        const incr_y = gs.growth_speed * Math.sin(gs.direction);
+        const incr_x = gs.scale * gs.growth_speed * Math.cos(gs.direction);
+        const incr_y = gs.scale * gs.growth_speed * Math.sin(gs.direction);
         draw_twig_segment(gs, gs.x + incr_x, gs.y + incr_y);
         gs.x += incr_x;
         gs.y += incr_y;
@@ -51,6 +52,7 @@ function branch_growth_site(gs) {
     return new GrowthSite(
         gs.x,
         gs.y,
+        gs.scale,
         2.0 * gs.initial_direction - gs.direction,
         gs.growth_speed,
         gs.ttl * 0.5,
@@ -62,45 +64,22 @@ function branch_growth_site(gs) {
 function draw_twig_segment(gs, new_x, new_y) {
     // strokeCap(ROUND);
     stroke(gs.color);
-    strokeWeight(2.0 * Math.pow(0.75, gs.generation) + gs.ttl / 50.0);
+    strokeWeight(gs.scale * (2.0 * Math.pow(0.75, gs.generation) + gs.ttl / 50.0));
     line(gs.x, gs.y, new_x, new_y);
-}
-
-let global_growth_sites = [];
-
-function add_global_growth_site() {
-    global_growth_sites.push(new GrowthSite(
-        canvas_width / 2,
-        canvas_height / 2,
-        rand(0.0, 2.0 * Math.PI),
-        rand(2, 3),
-        rand(150, 300),
-        0,
-        rand(185, 245)
-    ));
 }
 
 const canvas_width  = 1000;
 const canvas_height = 1000;
-let frame_count = 0;
 
 function setup() {
     createCanvas(canvas_width, canvas_height);
     background(0);
 
-    add_global_growth_site();
-}
+    grow_twig(650, -40, 0.5, 110/180 * Math.PI, 2, 450, 220);
+    grow_twig(750, -20, 0.5, 120/180 * Math.PI, 2, 550, 220);
+    grow_twig(850, -10, 0.5, 140/180 * Math.PI, 2, 450, 220);
 
-function draw() {
-    if (global_growth_sites.length > 0) {
-        global_growth_sites = growth_step(global_growth_sites);
-    }
+    grow_twig(canvas_width, 450, 1.0, 230/180 * Math.PI, 2, 300, 230);
 
-    frame_count += 1;
-    if (frame_count % 12 == 0) {
-        background(0, 0, 0, 10);
-    }
-    if (frame_count % 45 == 0) {
-        add_global_growth_site();
-    }
+    grow_twig(0, 750, 2.5, -40/180 * Math.PI, 2, 250, 245);
 }
