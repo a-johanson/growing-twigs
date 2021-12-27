@@ -18,8 +18,8 @@ class GrowthSite {
     }
 }
 
-function grow_twig(x, y, scale, direction, growth_speed, ttl, color) {
-    let growth_sites = [new GrowthSite(x, y, scale, direction, growth_speed, ttl, 0, color)];
+function grow_twig(x, y, scale, direction_degrees, growth_speed, ttl, color) {
+    let growth_sites = [new GrowthSite(x, y, scale, direction_degrees / 180.0 * Math.PI, growth_speed, ttl, 0, color)];
 
     while (growth_sites.length > 0) {
         growth_sites = growth_step(growth_sites);
@@ -75,11 +75,11 @@ function setup() {
     createCanvas(canvas_width, canvas_height);
     background(0);
 
-    grow_twig(650, -40, 0.5, 110/180 * Math.PI, 2, 450, 220);
-    grow_twig(750, -20, 0.5, 120/180 * Math.PI, 2, 550, 220);
-    grow_twig(850, -10, 0.5, 140/180 * Math.PI, 2, 450, 220);
+    grow_twig(650, -40, 0.5, 110, 2, 450, 220);
+    grow_twig(750, -20, 0.5, 120, 2, 550, 220);
+    grow_twig(850, -10, 0.5, 140, 2, 450, 220);
 
-    grow_twig(canvas_width, 450, 1.0, 230/180 * Math.PI, 2, 300, 230);
+    grow_twig(canvas_width, 450, 1.0, 230, 2, 300, 230);
 
-    grow_twig(0, 750, 2.5, -40/180 * Math.PI, 2, 250, 245);
+    grow_twig(0, 750, 2.5, -40, 2, 250, 245);
 }
