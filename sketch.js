@@ -1,4 +1,9 @@
 
+var prng = new Math.seedrandom("grow a twig");
+function rand(min, max) {
+    return (max - min) * prng() + min;
+}
+
 class GrowthSite {
     constructor(x, y, direction, growth_speed, ttl, generation, color) {
         this.x = x;
@@ -12,8 +17,6 @@ class GrowthSite {
     }
 }
 
-// const noise_scale = 0.1;
-
 function grow_twig(x, y, direction, growth_speed, ttl, color) {
     let growth_sites = [new GrowthSite(x, y, direction, growth_speed, ttl, 0, color)];
 
@@ -23,13 +26,11 @@ function grow_twig(x, y, direction, growth_speed, ttl, color) {
 }
 
 function growth_step(growth_sites) {
-    // const max_noise_value = 0.9; // for unbiased results using 4 octaves of noise with a decay of 0.5, use = 15.0 / 16.0;
     const max_angle_incr = Math.PI / 16.0;
     const branching_angle = Math.PI / 6.0;
 
     growth_sites.forEach(gs => {
-        // gs.direction += 2.0 * max_angle_incr * (noise(noise_scale * gs.x, noise_scale * gs.y) - 0.5 * max_noise_value);
-        gs.direction += 2.0 * max_angle_incr * (Math.random() - 0.5);
+        gs.direction += rand(-max_angle_incr, max_angle_incr);
         if (Math.abs(gs.direction - gs.initial_direction) > branching_angle) {
             growth_sites.push(branch_growth_site(gs));
             gs.initial_direction = gs.direction;
@@ -51,7 +52,7 @@ function branch_growth_site(gs) {
         gs.x,
         gs.y,
         2.0 * gs.initial_direction - gs.direction,
-        gs.growth_speed,// - 0.25 * noise(noise_scale * gs.x, noise_scale * gs.y, 5.0),
+        gs.growth_speed,
         gs.ttl * 0.5,
         gs.generation + 1,
         gs.color
@@ -63,10 +64,6 @@ function draw_twig_segment(gs, new_x, new_y) {
     stroke(gs.color);
     strokeWeight(2.0 * Math.pow(0.75, gs.generation) + gs.ttl / 50.0);
     line(gs.x, gs.y, new_x, new_y);
-}
-
-function rand(min, max) {
-    return (max - min) * Math.random() + min;
 }
 
 let global_growth_sites = [];
@@ -88,8 +85,6 @@ const canvas_height = 1000;
 let frame_count = 0;
 
 function setup() {
-    // noiseSeed(589022682);
-    // noiseDetail(4, 0.5);
     createCanvas(canvas_width, canvas_height);
     background(0);
 
@@ -102,7 +97,6 @@ function draw() {
     }
 
     frame_count += 1;
-
     if (frame_count % 12 == 0) {
         background(0, 0, 0, 10);
     }
